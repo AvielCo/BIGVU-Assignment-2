@@ -1,0 +1,17 @@
+<div class="container">
+  <div class="col">
+    <div class="d-flex flex-row justify-content-center">
+      <app-textfield (textChangedEvent)="changeText($event)"></app-textfield>
+      <app-dropdown
+        (pictureChangedEvent)="changePicture($event)"
+      ></app-dropdown>
+    </div>
+    <div class="row">
+      <app-canvas
+        [text]="text"
+        [picture]="picture"
+        [backgroundColor]="backgroundColor!"
+      ></app-canvas>
+    </div>
+  </div>
+</div>

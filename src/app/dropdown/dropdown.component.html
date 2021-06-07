@@ -1,0 +1,27 @@
+<div class="my-3 mx-2">
+  <div
+    type="button"
+    class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split"
+    data-bs-toggle="dropdown"
+  >
+    <span *ngIf="activePicture == null; else active">Pictures</span>
+    <ng-template #active
+      ><span>{{ activePicture!.name }}</span></ng-template
+    >
+  </div>
+  <ul class="dropdown-menu" data-popper-placement="bottom-start">
+    <li *ngFor="let picture of pictures">
+      <div *ngIf="picture != activePicture; then inactive; else active"></div>
+      <ng-template #inactive>
+        <a class="dropdown-item" (click)="onPictureChange(picture)">
+          {{ picture.name }}
+        </a>
+      </ng-template>
+      <ng-template #active>
+        <a class="dropdown-item active">
+          {{ picture.name }}
+        </a>
+      </ng-template>
+    </li>
+  </ul>
+</div>
