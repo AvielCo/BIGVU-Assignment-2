@@ -6,5 +6,5 @@
 
 ### Execute
 
-> 1. In root folder: `npm run build-serve:ssr`
-> 2. In the browser go to `localhost:4000`
+> 1. In root folder: `npm run build-serve:ssr`; This will build the project files and run the project with Server Side Rendering (SSR).
+> 2. In the browser go to `localhost:4000`; This address has SSR enabled.
