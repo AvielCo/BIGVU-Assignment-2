@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { TransferHttpCacheModule } from '@nguniversal/common';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -10,7 +11,11 @@ import { TextfieldComponent } from './textfield/textfield.component';
 import { CanvasComponent } from './canvas/canvas.component';
 import { HomeComponent } from './home/home.component';
 import { ColorsComponent } from './colors/colors.component';
-import { HttpClientModule, HttpClientJsonpModule } from '@angular/common/http';
+import {
+  HttpClientModule,
+  HttpClientJsonpModule,
+  HTTP_INTERCEPTORS,
+} from '@angular/common/http';
 @NgModule({
   declarations: [
     AppComponent,
@@ -24,9 +29,10 @@ import { HttpClientModule, HttpClientJsonpModule } from '@angular/common/http';
   imports: [
     HttpClientModule,
     HttpClientJsonpModule,
-    BrowserModule,
+    BrowserModule.withServerTransition({ appId: 'serverApp' }),
     AppRoutingModule,
     BrowserAnimationsModule,
+    TransferHttpCacheModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

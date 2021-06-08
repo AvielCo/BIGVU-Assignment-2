@@ -1,6 +1,14 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  Output,
+  EventEmitter,
+  SimpleChanges,
+} from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Picture } from '../canvas/picture.model';
+import { IPicture } from '../canvas/picture.interface';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-dropdown',
@@ -13,19 +21,29 @@ export class DropdownComponent implements OnInit {
 
   activePicture?: Picture;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private titleService: Title) {}
 
-  ngOnInit(): void {
-    this.fetchPictures();
+  async ngOnInit() {
+    await this.fetchPictures();
   }
 
-  private fetchPictures() {
-    this.http
-      .get('https://bigvu-interviews-assets.s3.amazonaws.com/presenters.json')
-      .subscribe((pictures) => console.log(pictures));
+  private async fetchPictures() {
+    const _pictures = await this.http
+      .get<IPicture[]>(
+        'https://bigvu-interviews-assets.s3.amazonaws.com/presenters.json'
+      )
+      .toPromise();
+    _pictures.forEach((picture) => {
+      this.pictures.push(new Picture(picture.name, picture.value));
+    });
+  }
+
+  setTitle(newTitle: string) {
+    this.titleService.setTitle(newTitle);
   }
 
   onPictureChange(picture: Picture) {
+    this.setTitle(`BIGVU - ${picture.name}`);
     this.activePicture = picture;
     this.pictureChangedEvent.emit(picture);
   }

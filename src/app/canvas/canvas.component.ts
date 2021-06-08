@@ -1,5 +1,15 @@
-import { OnInit, SimpleChanges } from '@angular/core';
-import { Component, ElementRef, ViewChild, Input } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  ViewChild,
+  Input,
+  PLATFORM_ID,
+  Inject,
+  OnInit,
+  SimpleChanges,
+} from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+
 import { Picture } from './picture.model';
 
 @Component({
@@ -10,12 +20,12 @@ import { Picture } from './picture.model';
 export class CanvasComponent implements OnInit {
   @ViewChild('canvas', { static: true }) canvas!: ElementRef<HTMLCanvasElement>;
   private ctx: CanvasRenderingContext2D | null = null;
-  private imageElement: HTMLImageElement = new Image();
+  private imageElement?: HTMLImageElement;
   @Input() picture!: Picture;
   @Input() text!: string;
   @Input() backgroundColor!: string;
 
-  constructor() {}
+  constructor(@Inject(PLATFORM_ID) private platformId: any) {}
 
   wrapText(x: number, y: number, maxWidth: number, lineHeight: number) {
     var words = this.text.split(' ');
@@ -45,17 +55,17 @@ export class CanvasComponent implements OnInit {
     this.ctx!.shadowBlur = 5;
     this.ctx!.fillRect(0, 0, canvasElement.width, canvasElement.height);
 
-    this.ctx!.fillStyle = 'white';
+    this.ctx!.fillStyle = this.backgroundColor === 'blue' ? 'white' : 'blue';
     this.ctx!.font = 'bold 3rem Inter';
     this.ctx!.textAlign = 'center';
 
-    if (this.imageElement.src != null) {
+    if (this.imageElement!.src != null) {
       this.ctx?.drawImage(
-        this.imageElement,
+        this.imageElement!,
         20,
         20,
-        this.imageElement.width,
-        this.imageElement.height,
+        this.imageElement!.width,
+        this.imageElement!.height,
         10,
         10,
         canvasElement.width,
@@ -63,37 +73,49 @@ export class CanvasComponent implements OnInit {
       );
     }
 
-    const x = canvasElement.width - this.imageElement.width / 2;
+    const x = canvasElement.width - this.imageElement!.width / 2;
     const textMetrics: TextMetrics = this.ctx?.measureText(this.text)!;
 
     this.wrapText(
       x,
       70,
-      this.imageElement.width,
+      this.imageElement!.width,
       textMetrics.fontBoundingBoxAscent
     );
   }
 
+  initImageElement() {
+    if (!this.imageElement) {
+      this.imageElement = new Image();
+      this.imageElement.alt = 'placeholder';
+      this.imageElement.src =
+        'https://socialistmodernism.com/wp-content/uploads/2017/07/placeholder-image.png';
+    }
+  }
+
   ngOnInit() {
-    this.imageElement.addEventListener('load', () => {
-      this.canvasChange();
-    });
-    this.imageElement.src =
-      'https://socialistmodernism.com/wp-content/uploads/2017/07/placeholder-image.png';
-    this.imageElement.alt = 'placeholder';
+    if (isPlatformBrowser(this.platformId)) {
+      this.initImageElement();
+      this.imageElement!.addEventListener('load', () => {
+        this.canvasChange();
+      });
+    }
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    for (const change in changes) {
-      if (change == 'text') {
-        this.canvasChange();
-      }
-      if (change == 'picture' && this.picture) {
-        this.imageElement.src = this.picture.url;
-        this.imageElement.alt = this.picture.name;
-      }
-      if (change === 'backgroundColor') {
-        this.canvasChange();
+    if (isPlatformBrowser(this.platformId)) {
+      this.initImageElement();
+      for (const change in changes) {
+        if (change === 'text') {
+          this.canvasChange();
+        }
+        if (change === 'picture' && this.picture) {
+          this.imageElement!.src = this.picture!.value;
+          this.imageElement!.alt = this.picture!.name;
+        }
+        if (change === 'backgroundColor') {
+          this.canvasChange();
+        }
       }
     }
   }
